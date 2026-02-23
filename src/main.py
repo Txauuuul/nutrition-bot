@@ -982,9 +982,9 @@ async def setup_dispatcher():
 async def main():
     """Inicia el bot."""
     
-    # Inicializar base de datos
+    # Inicializar base de datos PostgreSQL + crear pool
     await db.initialize()
-    logger.info("✅ Base de datos inicializada")
+    logger.info("✅ Base de datos PostgreSQL inicializada")
     
     # Crear bot
     bot = Bot(token=TELEGRAM_BOT_TOKEN)
@@ -999,6 +999,8 @@ async def main():
         # Iniciar polling (escucha cambios)
         await dp.start_polling(bot)
     finally:
+        # Cerrar conexiones y pool
+        await db.close()
         await bot.session.close()
 
 

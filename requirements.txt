@@ -8,18 +8,8 @@ google-generativeai
 aiohttp
 requests
 
-# Database
-aiosqlite
-
-# Environment variables
-python-dotenv
-
-# Image handling & Barcode reading
-Pillow
-pyzbar
-python-barcode
-pytesseract
-opencv-python-headless
+# Database - PostgreSQL
+asyncpg
 
 # JSON and data validation
 pydantic

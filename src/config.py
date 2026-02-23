@@ -22,8 +22,6 @@ load_dotenv()
 # RUTAS DEL PROYECTO
 # ==========================================
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = BASE_DIR / "data"
-DATA_DIR.mkdir(exist_ok=True)
 
 # ==========================================
 # TELEGRAM
@@ -65,50 +63,20 @@ USDA_API_ENDPOINT = os.getenv(
 )
 
 # ==========================================
-# BARCODE LOOKUP API (Sin autenticación, 500 req/día gratis)
+# BARCODE APIs (Fallback)
 # ==========================================
 BARCODE_LOOKUP_API = "https://api.barcodebins.com/api/lookup"
-BARCODE_LOOKUP_KEY = os.getenv("BARCODE_LOOKUP_KEY", "")  # Opcional
+BARCODE_LOOKUP_KEY = os.getenv("BARCODE_LOOKUP_KEY", "")
 
-# ==========================================
-# UPC DATABASE (Alternativa si Barcode Lookup falla)
-# ==========================================
 UPC_DATABASE_API = "https://api.upcitemdb.com/prod/trial/lookup"
 
 # ==========================================
-# BARCODE LOOKUP API (Sin autenticación, 500 req/día gratis)
+# POSTGRESQL - SUPABASE
 # ==========================================
-BARCODE_LOOKUP_API = "https://api.barcodebins.com/api/lookup"
-BARCODE_LOOKUP_KEY = os.getenv("BARCODE_LOOKUP_KEY", "")  # Opcional
-
-# ==========================================
-# UPC DATABASE (Alternativa si Barcode Lookup falla)
-# ==========================================
-UPC_DATABASE_API = "https://api.upcitemdb.com/prod/trial/lookup"
-
-# ==========================================
-# BASE DE DATOS
-# ==========================================
-DB_PATH = os.getenv("DB_PATH", str(DATA_DIR / "nutrition_bot.db"))
-
-# ==========================================
-# LOGGING
-# ==========================================
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-
-# ==========================================
-# FECHA Y HORA - LÓGICA DEL DÍA
-# ==========================================
-# El "día lógico" comienza a las 3:00 AM y termina a las 2:59:59 AM
-# Esto es importante para las consultas de calorías diarias
-LOGICAL_DAY_START_HOUR = 3
-
-# ==========================================
-# CONSTANTES DE LA APLICACIÓN
-# ==========================================
-# Cambios menores que se pueden hacer sin recargar el bot
-DEFAULT_MACROS = {
-    "carbs": 300,      # Carbohidratos
-    "protein": 150,    # Proteínas
-    "fat": 80,         # Grasas
-}
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError(
+        "DATABASE_URL no está configurado. "
+        "Crea un archivo .env con esta variable. "
+        "Obtén la URL de tu proyecto Supabase."
+    )
