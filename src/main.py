@@ -22,6 +22,8 @@ FSM STATES:
 """
 
 import asyncio
+import os
+from aiohttp import web
 from datetime import datetime
 from aiogram import Dispatcher, Router, F, Bot
 from aiogram.types import Message, PhotoSize, InlineKeyboardMarkup, InlineKeyboardButton
@@ -974,6 +976,25 @@ async def setup_dispatcher():
     
     return dp
 
+# ==========================================
+# SERVIDOR WEB DUMMY (PARA RENDER)
+# ==========================================
+
+async def health_check(request):
+    """Respuesta básica para que Render sepa que estamos vivos"""
+    return web.Response(text="¡Bot nutricional funcionando perfectamente!")
+
+async def start_dummy_server():
+    """Inicia un servidor web falso para mantener el puerto abierto en Render"""
+    app = web.Application()
+    app.router.add_get('/', health_check)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    # Render inyecta el puerto que quiere en la variable de entorno PORT
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    logger.info(f"✅ Servidor web de mentira escuchando en el puerto {port}")
 
 # ==========================================
 # FUNCIÓN PRINCIPAL
@@ -986,6 +1007,8 @@ async def main():
     await db.initialize()
     logger.info("✅ Base de datos PostgreSQL inicializada")
     
+    await start_dummy_server()
+
     # Crear bot
     bot = Bot(token=TELEGRAM_BOT_TOKEN)
     
