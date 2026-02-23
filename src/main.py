@@ -523,6 +523,21 @@ async def handle_barcode_quantity(message: Message, state: FSMContext) -> None:
     text = message.text.strip()
     
     try:
+        # ========== DETECTAR SI ES DESCRIPCIÓN DE COMIDA EN VEZ DE CANTIDAD ==========
+        # Si el texto contiene palabras (no solo números/sufijos de gramos),
+        # es una descripción de comida → salir del FSM y procesar normalmente
+        cleaned_check = text.lower().strip()
+        for suffix in ["gramos", "grams", "gram", "gr", "g"]:
+            cleaned_check = cleaned_check.replace(suffix, "")
+        cleaned_check = cleaned_check.replace(" ", "").replace(".", "").replace(",", "")
+        
+        if not cleaned_check.isdigit():
+            # NO es un número → es una descripción de comida
+            # Limpiar estado FSM y procesar como texto normal
+            await state.clear()
+            await handle_text_or_barcode(message, state)
+            return
+        
         # Parseador más flexible - acepta "150", "150gr", "150 gr", "150g", "150 gramos"
         # Limpiar sufijos comunes de cantidad (orden: más largo primero)
         cleaned_text = text.lower().strip()
