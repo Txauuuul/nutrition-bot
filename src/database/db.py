@@ -144,6 +144,7 @@ class Database:
                     min_size=5,
                     max_size=20,
                     command_timeout=10,
+                    statement_cache_size=0,
                     ssl='require' if 'localhost' not in self.database_url else False
                 )
                 print("✅ Pool de conexiones PostgreSQL creado")
