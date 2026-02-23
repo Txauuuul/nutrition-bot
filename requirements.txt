@@ -11,6 +11,9 @@ requests
 # Database - PostgreSQL
 asyncpg
 
+# Environment variables
+python-dotenv
+
 # JSON and data validation
 pydantic
 
