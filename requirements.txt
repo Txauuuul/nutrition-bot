@@ -28,3 +28,10 @@ loguru
 
 # LLM - Groq
 groq
+
+# Image processing & Barcode detection
+Pillow
+opencv-python
+numpy
+pyzbar
+pytesseract
