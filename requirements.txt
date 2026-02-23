@@ -1,0 +1,37 @@
+# Core Bot Framework
+aiogram
+
+# Google API (Gemini)
+google-generativeai
+
+# HTTP requests for APIs
+aiohttp
+requests
+
+# Database
+aiosqlite
+
+# Environment variables
+python-dotenv
+
+# Image handling & Barcode reading
+Pillow
+pyzbar
+python-barcode
+pytesseract
+opencv-python-headless
+
+# JSON and data validation
+pydantic
+
+# Error tracking (optional)
+sentry-sdk
+
+# Async utilities
+asyncio
+
+# Logging improvements (optional)
+loguru
+
+# LLM - Groq
+groq
