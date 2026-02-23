@@ -80,3 +80,12 @@ if not DATABASE_URL:
         "Crea un archivo .env con esta variable. "
         "Obtén la URL de tu proyecto Supabase."
     )
+
+# ==========================================
+# LÓGICA DEL "DÍA" (Nutrición)
+# ==========================================
+# El día nutricional comienza a las 3:00 AM en lugar de las 00:00 AM
+# Esto permite que los usuarios finales durmiendo no pierdan sus datos
+# Ejemplo: Un usuario que se duerme a las 2 AM sigue en el "día anterior"
+# Así sus datos nocturno no se dividen en dos días
+LOGICAL_DAY_START_HOUR = int(os.getenv("LOGICAL_DAY_START_HOUR", 3))
