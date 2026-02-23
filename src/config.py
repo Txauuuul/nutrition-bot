@@ -76,9 +76,24 @@ UPC_DATABASE_API = "https://api.upcitemdb.com/prod/trial/lookup"
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError(
-        "DATABASE_URL no está configurado. "
-        "Crea un archivo .env con esta variable. "
-        "Obtén la URL de tu proyecto Supabase."
+        "❌ DATABASE_URL no está configurado. \n"
+        "En Render: Añade la variable de entorno DATABASE_URL con tu URL de Supabase. \n"
+        "Formato esperado: postgresql://user:password@host:5432/database"
+    )
+
+# Validar que DATABASE_URL no sea un placeholder
+if "your_password" in DATABASE_URL or "xxxxx" in DATABASE_URL:
+    raise ValueError(
+        "❌ DATABASE_URL contiene placeholders (your_password, xxxxx). \n"
+        "Reemplaza con tus credenciales reales de Supabase. \n"
+        "En Render: Usa el valor real de tu base de datos."
+    )
+
+# Validar formato básico
+if not DATABASE_URL.startswith("postgresql://"):
+    raise ValueError(
+        "❌ DATABASE_URL debe comenzar con 'postgresql://'. \n"
+        "Valor actual: " + DATABASE_URL[:30] + "..."
     )
 
 # ==========================================

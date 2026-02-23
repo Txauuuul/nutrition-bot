@@ -17,6 +17,8 @@ from datetime import datetime, timedelta, time
 from typing import Optional, List, Dict, Tuple
 from dataclasses import dataclass
 import os
+import socket
+import urllib.parse
 
 from src.config import LOGICAL_DAY_START_HOUR
 
@@ -116,14 +118,57 @@ class Database:
     
     async def connect(self) -> None:
         if self.pool is None:
-            self.pool = await asyncpg.create_pool(
-                self.database_url,
-                min_size=5,
-                max_size=20,
-                command_timeout=10,
-                ssl='require' if 'localhost' not in self.database_url else False
-            )
-            print("✅ Pool de conexiones PostgreSQL creado")
+            try:
+                # Extraer host del DATABASE_URL para diagnóstico
+                parsed = urllib.parse.urlparse(self.database_url)
+                host = parsed.hostname
+                port = parsed.port or 5432
+                
+                print(f"🔍 Intentando conectar a: {host}:{port}")
+                
+                # Pre-conectar para diagnóstico
+                try:
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.settimeout(5)
+                    result = sock.connect_ex((host, port))
+                    sock.close()
+                    if result == 0:
+                        print(f"✅ Puerto {port} en {host} está accesible")
+                    else:
+                        print(f"❌ No se puede alcanzar {host}:{port} (error {result})")
+                except Exception as e:
+                    print(f"⚠️ Diagnóstico de red falló: {e}")
+                
+                self.pool = await asyncpg.create_pool(
+                    self.database_url,
+                    min_size=5,
+                    max_size=20,
+                    command_timeout=10,
+                    ssl='require' if 'localhost' not in self.database_url else False
+                )
+                print("✅ Pool de conexiones PostgreSQL creado")
+            except OSError as e:
+                print(f"❌ Error de conexión de red a Supabase: {str(e)}")
+                print("\n📋 DIAGNÓSTICO:")
+                print("✓ Verifica que DATABASE_URL es correcto en Render")
+                print("✓ La URL debe ser: postgresql://user:password@host:5432/database")
+                print("✓ Supabase puede tener restricciones de IP - añade a whitelist")
+                print("\n📖 SOLUCIÓN:")
+                print("1. Dashboard Supabase → Settings → Database → Network")
+                print("2. Verifica 'Allow connections from anywhere' o whitelist Render IPs")
+                print("3. En Render: Redeploy después de confirmar")
+                raise
+            except asyncpg.InvalidCatalogNameError:
+                print(f"❌ Base de datos no existe: {parsed.path[1:]}")
+                print("En Supabase, la base de datos por defecto es 'postgres'")
+                raise
+            except asyncpg.AuthenticationFailedError as e:
+                print(f"❌ Autenticación fallida: {str(e)}")
+                print("Verifica usuario y password en DATABASE_URL")
+                raise
+            except Exception as e:
+                print(f"❌ Error conectando a PostgreSQL: {type(e).__name__}: {str(e)}")
+                raise
     
     async def close(self) -> None:
         if self.pool:
